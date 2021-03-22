@@ -11,6 +11,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\VerifyEmail;
+use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
@@ -47,7 +48,7 @@ class RegisterController extends Controller
 	 */
 	public function __construct()
 	{
-		$this->middleware('guest');
+		$this->middleware('guest', ['except' => 'confirm']);
 	}
 
 	/**
@@ -102,15 +103,34 @@ class RegisterController extends Controller
 		$user = User::where('email', '=', $email)->where('confirmation_code', '=',
 			$confirmation_code)->first();
 
-		if (! is_null($user)) {
-			$user->confirmed = 1;
+		if (is_null($user)) {
+			$user = User::where('email', '=', $email)->whereNotNull('confirmation_code')->where('confirmed', true)->first();
+		}
+
+		if (!is_null($user)) {
+			try {
+				Validator::validate(['email' => $user->confirmation_code],
+					['email' => 'email|max:255',]
+				);
+				$isEmailUpdate = true;
+			} catch (ValidationException $exception) {
+				$isEmailUpdate = false;
+			}
+
+			if($isEmailUpdate) {
+				$user->email = $user->confirmation_code;
+			} else {
+				$user->confirmed = 1;
+			}
 			$user->confirmation_code = null;
 			$user->save();
 			Session::flash('messages-success',
 				new MessageBag([
-					"Die E-Mail-Adresse wurde bestätigt."
+					$isEmailUpdate ? "Deine neue E-Mail-Adresse wurde bestätigt." : "Die E-Mail-Adresse wurde bestätigt.",
 				]));
-			$this->guard()->login($user);
+			if(!$this->guard()->check()) {
+				$this->guard()->login($user);
+			}
 			return redirect('home');
 		}
 		return redirect($this->redirectPath());

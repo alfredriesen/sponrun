@@ -11,14 +11,25 @@ class VerifyEmail extends Notification
     use Queueable;
 
     private $confirmationCode;
-    
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct($confirmationCode)
+
+	private $isEmailUpdate;
+
+	/**
+	 * @var string
+	 */
+	private $oldMail;
+
+	/**
+	 * Create a new notification instance.
+	 *
+	 * @param string $confirmationCode
+	 * @param bool $isEmailUpdate
+	 * @param string $oldMail
+	 */
+    public function __construct(string $confirmationCode, bool $isEmailUpdate = false, string $oldMail = '')
     {
+		$this->oldMail = $oldMail;
+		$this->isEmailUpdate = $isEmailUpdate;
         $this->confirmationCode = $confirmationCode;
     }
 
@@ -41,10 +52,11 @@ class VerifyEmail extends Notification
 	 */
 	public function toMail($notifiable)
 	{
-		$link = route('register.verify', $this->confirmationCode) . '?email=' . urlencode($notifiable->getEmailForPasswordReset());
+		$email = $this->isEmailUpdate ? $this->oldMail : $notifiable->getEmailForPasswordReset();
+		$link = route('register.verify', $this->confirmationCode) . '?email=' . urlencode($email);
 		return (new MailMessage())->subject('E-Mail-Adresse bestätigen')
-			->line('Du erhältst diese E-Mail, weil diese E-Mail-Adresse auf unserer Website zur Registrierung angegeben wurde.')
-			->line('Wenn Du Deinen Account freischalten möchtest, bestätige bitte Deine E-Mail:')
+			->line($this->isEmailUpdate ? 'Du erhältst diese E-Mail, weil du Deine E-Mail-Adresse auf unserer Website aktualisiert hast.': 'Du erhältst diese E-Mail, weil diese E-Mail-Adresse auf unserer Website zur Registrierung angegeben wurde.')
+			->line($this->isEmailUpdate ? 'Bitte bestätige Deine neue E-Mail-Adresse:' : 'Wenn Du Deinen Account freischalten möchtest, bestätige bitte Deine E-Mail:')
 			->action('E-Mail-Adresse bestätigen', $link)
 			->line('Wenn Du dich nicht auf unserer Website registriert hast, solltest Du die E-Mail nicht bestätigen.');
 	}
