@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Model\Sponsor\RunParticipation;
 use App\Domain\Model\Sponsor\Sponsor;
+use App\Notifications\NewSponsor;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -62,6 +63,16 @@ class UserRunPartSponController extends Controller
 		$sponsor->runParticipation()->associate($runpart);
 		$sponsor->fill($attributes);
 		$sponsor->save();
+		if(!empty($sponsor->email)) {
+			$sponsor->notify(
+				new NewSponsor(
+					$sponsor->getFullnameAttribute(),
+					$sponsor->donation_per_lap,
+					$sponsor->donation_static_max,
+					true,
+					$user->getFullnameAttribute()
+				));
+		}
 		return redirect()->route('runpart.sponsor.index', $runpart->id);
 	}
 

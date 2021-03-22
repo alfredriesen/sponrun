@@ -68,4 +68,14 @@ class User extends Authenticatable
 		$this->notify(new ResetPassword($token));
 		Session::flash('messages-success', new MessageBag(["Dir wurde eine Mail zugeschickt"]));
 	}
+
+	/**
+	 * Get the user's full name.
+	 *
+	 * @return string
+	 */
+	public function getFullnameAttribute()
+	{
+		return "{$this->firstname} {$this->lastname}";
+	}
 }

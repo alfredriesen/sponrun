@@ -66,8 +66,18 @@ class SponSelfController extends Controller
 			"Erfolgreich gespeichert"
 		]));
 		$user->notify(
-			new NewSponsor($sponsor->firstname . ' ' . $sponsor->lastname, $sponsor->donation_per_lap,
+			new NewSponsor($sponsor->getFullnameAttribute(), $sponsor->donation_per_lap,
 				$sponsor->donation_static_max));
+		if(!empty($sponsor->email)) {
+			$sponsor->notify(
+				new NewSponsor(
+					$sponsor->getFullnameAttribute(),
+					$sponsor->donation_per_lap,
+					$sponsor->donation_static_max,
+					true,
+					$user->getFullnameAttribute()
+				));
+		}
 		return redirect()->route('run.sponsor.create', $runpart->hash);
 	}
 }

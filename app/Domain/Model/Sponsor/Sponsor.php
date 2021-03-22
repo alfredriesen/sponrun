@@ -3,10 +3,13 @@
 namespace App\Domain\Model\Sponsor;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Validator;
 
 class Sponsor extends Model
 {
+
+	use Notifiable;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -71,5 +74,15 @@ class Sponsor extends Model
 					'donation_static_max' => ['nullable', 'required_without:donation_per_lap', 'regex:/^\d+[,.]?\d{0,2}$/', 'max:10'],
 					'wants_newsletter' => 'boolean'
 		]);
+	}
+
+	/**
+	 * Get the sponsor's full name.
+	 *
+	 * @return string
+	 */
+	public function getFullnameAttribute()
+	{
+		return "{$this->firstname} {$this->lastname}";
 	}
 }
