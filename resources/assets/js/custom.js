@@ -8,7 +8,7 @@ $(document).ready(function() {
 			$('#newsletter_dlg').modal('hide');
 		});
 	}
-	
+
 	$('#share-link-button').click(function(event){
 		let element = $('#share-link');
 		element.select();
@@ -19,7 +19,7 @@ $(document).ready(function() {
 	$('#share-link-button').mouseleave(function(event){
 		$('#share-link').tooltip('dispose');
 	});
-	
+
 	$('form.ajax-submit').submit(function(event) {
 		event.preventDefault();
 		let form = this;
@@ -37,7 +37,7 @@ $(document).ready(function() {
 			console.log(data);
 		});
 	});
-	
+
 	$('.editableLaps').click(function(){
 		if($(this).children().length == 0){
 			let cell = this;
@@ -48,28 +48,28 @@ $(document).ready(function() {
 			let div1 = document.createElement('div');
 			$(cell).append(div1);
 			$(div1).attr('class','input-group');
-			
+
 			let input = document.createElement('input');
 			$(div1).append(input);
 			$(input).attr('class','form-control');
 			$(input).attr('type','number');
 			$(input).attr('value', initialLaps);
-			
+
 
 			let div2 = document.createElement('div');
 			$(div1).append(div2);
 			$(div2).attr('class','input-group-append');
-			
+
 			let button = document.createElement('button');
 			$(div2).append(button);
 			$(button).attr('class','btn btn-outline-secondary');
-			
+
 			let icon = document.createElement('i');
 			$(button).append(icon);
 			$(icon).attr('class','fa fa-save');
 
 			$(div1).attr('style', 'width: 120px;');
-			
+
 			$(input).focus();
 			$(input).select();
 			$(input).bind("submit",function(e){
@@ -97,7 +97,7 @@ $(document).ready(function() {
 			$(input).bind("exit",function(e){
 				$(cell).text(initialLaps);
 			});
-			
+
 
 			$(input).keyup(function(e) {
 				switch(e.keyCode) {
@@ -109,14 +109,14 @@ $(document).ready(function() {
 						break;
 				}
 			});
-			
+
 			$(document).mouseup(function (e) {
 				if (!$(cell).is(e.target) && $(cell).has(e.target).length === 0)
 				{
 					$(input).trigger("exit");
 				}
 			});
-			
+
 			$(button).click(function(e) {
 				$(input).trigger("submit");
 			});
@@ -124,4 +124,25 @@ $(document).ready(function() {
 	});
 
 	$('.dataTable').DataTable();
+
+	let inputProjects =  document.querySelector('.input-projects')
+	if(inputProjects) {
+		(async () => {
+			const { default: Vue, } = await import( /* webpackChunkName: "vendors-vue" */ 'vue')
+			const { default: vSelect, } = await import( /* webpackChunkName: "vendors-vue" */ 'vue-select')
+			Vue.component('v-select', vSelect)
+
+			const { default: Autocomplete, } = await import('./components/Autocomplete')
+			new Vue({
+				el: inputProjects,
+				render: (h) => {
+					return h(Autocomplete, {
+						props: {
+							...$(inputProjects).data(),
+						},
+					})
+				},
+			})
+		})()
+	}
 });

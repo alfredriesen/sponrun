@@ -2,10 +2,11 @@
 <div class="form-group">
 	{{ Form::label('project_id', 'Unterstütztes Projekt') }}
 
-	
+
 	<div>
+		<div class="vue-loading input-projects" data-projects="{{ json_encode($projects) }}" data-project-id="{{ $selectedProjectId }}"></div>
 		{{ Form::select('project_id', $projects, $selectedProjectId,
-			[ 'class' => "form-control custom-select".($errors->has('project_id') ? ' is-invalid' : '') ]) }}
+			[ 'class' => "d-none form-control custom-select".($errors->has('project_id') ? ' is-invalid' : '') ]) }}
 
 		@if ($errors->has('project'))
 		<div class="invalid-feedback">

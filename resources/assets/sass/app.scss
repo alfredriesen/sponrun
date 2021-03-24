@@ -17,3 +17,26 @@
 
 // Custom CSS
 @import './custom.css';
+@import '~vue-select/dist/vue-select.css';
+
+.vue-loading {
+  text-align: center;
+  padding: .25rem;
+  background-color: rgba(0,0,0,.03);
+
+  &:after {
+	display: inline-block;
+	width: 1.5rem;
+	height: 1.5rem;
+	vertical-align: text-bottom;
+	border: 0.125em solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: .75s linear infinite spinner-custom;
+	content: ' ';
+  }
+
+  @keyframes spinner-custom {
+	to { transform: rotate(360deg); }
+  }
+}
